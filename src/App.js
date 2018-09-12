@@ -1,37 +1,32 @@
 import React, { Component } from 'react';
 import './App.css';
 import Validator from "./Validator/Validator";
+import CharComp from "./CharComp/CharComp";
 
 class App extends Component {
   state = {
     inputValue: '',
     charCount: 0, 
-    isValidLength: false
+    isValidlength: false,
+    inputChars: []
   };
 
   inputHandler = (event) => {
     let inputValue = event.target.value;
     let charCount = inputValue.length;
+    let isValid = charCount >= 10 ? true: false;
+    let charArray = [...inputValue];
 
-    this.setState({ 
-      inputValue: inputValue, 
-      charCount: charCount 
+    this.setState({
+      inputValue: inputValue,
+      charCount: charCount,
+      isValidlength: isValid, 
+      inputChars: charArray
     });
   }
 
-  validationHandler = () => {
-    const minLength = 10;
-    if (this.state.charCount >= minLength) {
-      this.setState({
-        isValidLength: true
-      });
-    } else {
-      this.setState({
-        isValidLength: false
-      });
-    }
-  }
-  
+
+
   render() {
     const style = {
       textAlign: 'center'
@@ -50,6 +45,31 @@ class App extends Component {
       cursor: 'pointer'
     };
 
+    let validator = (
+      <Validator
+        charCount={this.state.charCount}
+        message={'input too short'}
+        validClass={'invalid'} />
+    );
+
+    if( this.state.isValidlength ){
+      validator = (
+        <Validator
+          charCount={this.state.charCount}
+          message={'valid input length'}
+          validClass={'valid'} />
+      )
+    }
+
+    let characters = null;
+    
+    for (let index = 0; index < this.state.inputChars.length; index++) {
+      const char = this.state.inputChars[index];
+        <CharComp 
+          key={index}
+          char={char} />
+
+    }
     return (
       <div className="App" style={ style }>
         <input
@@ -60,16 +80,18 @@ class App extends Component {
           placeholder='enter some text'>
         </input>
         {/* <p>You entered: { this.state.inputValue }</p> */}
-        <p>Number of characters: { this.state.charCount }</p>
-        { this.state.isValidLength ?
-          <Validator 
-            message='Length requirement met'
-            validClass='valid' />
-          :
-          <Validator 
-            message='Too Short'
-            validClass='invalid' /> 
-        }
+        { validator }
+        {  }
+        {/* <CharComp 
+          char={ this.state.inputChars[0] } />
+        <CharComp
+          char={this.state.inputChars[1]} />
+        <CharComp
+          char={this.state.inputChars[2]} />
+        <CharComp
+          char={this.state.inputChars[3]} />
+        <CharComp
+          char={this.state.inputChars[4]} /> */}
       </div>
     );
   }
