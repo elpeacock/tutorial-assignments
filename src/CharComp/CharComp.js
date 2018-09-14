@@ -11,7 +11,8 @@ const charBox = {
 
 const charComp = ( props ) => {
     return (
-        <div style={ charBox }
+        <div id={ props.id } 
+            style={ charBox }
             onClick={ props.click }>{ props.char }</div>
     )
 };

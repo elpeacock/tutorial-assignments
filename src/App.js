@@ -16,15 +16,44 @@ class App extends Component {
     let charCount = inputValue.length;
     let isValid = charCount >= 10 ? true: false;
     let charArray = [...inputValue];
+    let inputArray = [];
+
+    charArray.forEach((character, index) => { 
+      const id = 'char_' + index;
+      const charObj = { char: character, id: id };
+      inputArray.push(charObj);
+    });
 
     this.setState({
       inputValue: inputValue,
       charCount: charCount,
       isValidlength: isValid, 
-      inputChars: charArray
+      inputChars: inputArray
     });
   }
 
+  deleteCharacterHandler = (event, id) => {
+    const charIndex = this.state.inputChars.findIndex(c => {
+      return c.id === id;
+    });
+
+    const chars = [...this.state.inputChars];
+    chars.splice(charIndex, 1);
+
+    let charOnly = [];
+    chars.forEach((character) => {
+      charOnly.push(character.char);
+    });
+    
+    let modValue = charOnly.join('');
+    let isValid = modValue.length >= 10 ? true : false;
+
+    this.setState({ 
+      inputChars: chars, 
+      inputValue: modValue, 
+      charCount: modValue.length,
+      isValidlength: isValid })
+  }
 
 
   render() {
@@ -45,11 +74,14 @@ class App extends Component {
       cursor: 'pointer'
     };
 
-    let validator = (
-      <Validator
-        charCount={this.state.charCount}
-        message={'input too short'}
-        validClass={'invalid'} />
+    let validator = null;
+    if ( !this.state.isValidlength )(
+      validator = (
+        <Validator
+          charCount={this.state.charCount}
+          message={'input too short'}
+          validClass={'invalid'} />
+      )
     );
 
     if( this.state.isValidlength ){
@@ -59,17 +91,27 @@ class App extends Component {
           message={'valid input length'}
           validClass={'valid'} />
       )
-    }
+    };
 
-    let characters = null;
+    let charBoxes = [];
+
+    this.state.inputChars.forEach((character) => {
+      const charBox = (
+        <CharComp
+          char={ character.char }
+          id={ character.id } 
+          key={ character.id }
+          click={ (event) => this.deleteCharacterHandler(event, character.id) }/>
+      )
+      charBoxes.push(charBox);
+    });
     
-    for (let index = 0; index < this.state.inputChars.length; index++) {
-      const char = this.state.inputChars[index];
-        <CharComp 
-          key={index}
-          char={char} />
-
-    }
+    let characters = (
+      <div>
+        { charBoxes }
+      </div>
+    );
+    
     return (
       <div className="App" style={ style }>
         <input
@@ -79,19 +121,8 @@ class App extends Component {
           onChange={ this.inputHandler }
           placeholder='enter some text'>
         </input>
-        {/* <p>You entered: { this.state.inputValue }</p> */}
         { validator }
-        {  }
-        {/* <CharComp 
-          char={ this.state.inputChars[0] } />
-        <CharComp
-          char={this.state.inputChars[1]} />
-        <CharComp
-          char={this.state.inputChars[2]} />
-        <CharComp
-          char={this.state.inputChars[3]} />
-        <CharComp
-          char={this.state.inputChars[4]} /> */}
+        { characters }
       </div>
     );
   }
